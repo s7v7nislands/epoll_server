@@ -59,6 +59,8 @@ create_and_bind (char *port)
 		if (sfd == -1)
 			continue;
 
+		int tmp = 1;
+		setsockopt(sfd, SOL_SOCKET, SO_REUSEADDR, (char *)&tmp, sizeof(tmp));
 		s = bind (sfd, rp->ai_addr, rp->ai_addrlen);
 		if (s == 0)
 		{
@@ -136,6 +138,10 @@ main (int argc, char *argv[])
 		n = epoll_wait (efd, events, MAXEVENTS, -1);
 		for (i = 0; i < n; i++)
 		{
+			fprintf(stdout, "EPOLLIN event: %s\n", (events[i].events & EPOLLIN) ? "yes" : "no");
+			fprintf(stdout, "EPOLLOUT event: %s\n", (events[i].events & EPOLLOUT) ? "yes" : "no");
+			fprintf(stdout, "EPOLLHUP event: %s\n", (events[i].events & EPOLLHUP) ? "yes" : "no");
+			fprintf(stdout, "EPOLLERR event: %s\n", (events[i].events & EPOLLERR) ? "yes" : "no");
 			if ((events[i].events & EPOLLERR) ||
 					(events[i].events & EPOLLHUP) ||
 					(!(events[i].events & EPOLLIN)))
